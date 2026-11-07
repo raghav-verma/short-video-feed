@@ -1,0 +1,6 @@
+tags:
+  golden:
+    description: >-
+      Pixel comparisons against PNGs in test/golden/goldens. Baselines are
+      generated on macOS, so CI runs this tag on a macOS runner and the
+      Linux job excludes it.

@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Streams the feed videos. Debug/profile manifests add it too, release needs it here. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="short_video_feed"
+        android:label="Short Video Feed"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
