@@ -30,14 +30,13 @@ The numbers below were measured on a real phone in profile mode.
 
 All of it is in [`VideoControllerPool`](lib/feed/playback/video_controller_pool.dart). The feed page tells the pool which page is active; the pool decides which players exist and which one plays.
 
-```
-                 feed index:   3        4        5        6        7
- preload radius 1:                    [prev]  [ACTIVE]  [next]
- player state:   disposed    ready,    playing   ready,    disposed
-                             paused,             paused,
-                             at 0:00             first frame decoded
- init order:                   3rd       1st       2nd
-```
+With the default preload radius of 1, while post 5 is on screen:
+
+| Feed index | 3 | 4 | 5 | 6 | 7 |
+|---|---|---|---|---|---|
+| Role | outside | previous | **active** | next | outside |
+| Player | disposed | initialised, paused at 0:00 | playing | initialised, paused | disposed |
+| Initialised | – | 3rd | 1st | 2nd | – |
 
 The rules:
 
@@ -46,7 +45,7 @@ The rules:
 3. **Only the active post plays**, and only while playback is allowed: the feed route is on top (`RouteAware`) and the app is `resumed` (`AppLifecycleListener`). Opening the composer or locking the phone pauses without throwing away the preloaded window. Tap-to-pause is reset whenever the active post changes.
 4. **A post that stops being active is paused and rewound to 0:00**, so coming back to it shows the same frame as its poster.
 5. **Players are keyed by post id, not list index.** Appending a page or refreshing the feed can't hand a player to the wrong post.
-6. **First-frame posters.** Each post has a poster that is the stream's real first frame (extracted with `ffmpeg` and bundled). It sits on top of the video until the player reports `isPlaying` with `position > 0`, then fades out over 120 ms. Because the poster and the first decoded frame are the same picture, cropped the same way (`BoxFit.cover`), the swap is invisible. In a production app the poster would be a CDN thumbnail from the API.
+6. **First-frame posters.** Each post has a poster that is the stream's real first frame (extracted with `ffmpeg` and bundled). It sits on top of the video until the player reports `isPlaying` with `position > 0`, then fades out over 120 ms. Because the poster and the first decoded frame are the same picture, cropped the same way (`BoxFit.cover`), the swap doesn't jump. In a production app the poster would be a CDN thumbnail from the API.
 7. **Races.** `VideoPlayerController.initialize()` never completes if the controller is disposed mid-flight. Each slot therefore has its own `settled` future that also completes on disposal, and each reconcile pass carries a generation number, so a stale pass stops at its next `await`. A fast swipe from post 0 to post 6 disposes post 0's half-initialised player and never plays it; there is a test for exactly that.
 8. **Failures** (init error or a 20 s timeout) mark that slot as failed with a retry button. They don't block the neighbours.
 
@@ -54,13 +53,13 @@ The debug overlay (the speedometer icon in the app bar) shows the pool live: whi
 
 ## Measurements
 
-**Setup.** OnePlus 8 (IN2011: Snapdragon 865, 8 GB RAM, Android 13), **profile** build, home Wi-Fi in India, streaming public test streams from their own servers. [`integration_test/feed_benchmark_test.dart`](integration_test/feed_benchmark_test.dart) drives the real app: it waits for the first video, then swipes 20 times with 4 seconds on each post. [`tool/benchmark.sh`](tool/benchmark.sh) runs it once per preload radius and samples memory with `dumpsys meminfo` every 2 seconds. Two complete runs, so 39 start-ups per radius (one swipe per run didn't produce a usable sample; see below).
+**Setup.** OnePlus 8 (IN2011: Snapdragon 865, 8 GB RAM, Android 13), **profile** build, home Wi-Fi in India, streaming public test streams from their own servers. [`integration_test/feed_benchmark_test.dart`](integration_test/feed_benchmark_test.dart) drives the real app: it waits for the first video, then swipes 20 times with 4 seconds on each post. [`tool/benchmark.sh`](tool/benchmark.sh) runs it once per preload radius and samples memory with `dumpsys meminfo` every 2 seconds. Two complete runs: 40 swipes per radius, of which 39 produced a start-up sample (see *Run hygiene* below).
 
 The runs used an 8-stream catalogue. One of them, Shaka Player's *Angel One* demo clip, turned out to be an excerpt from a TV episode, so I removed it from the app afterwards. The app now ships the other 7 streams. Rerun `tool/benchmark.sh` to measure the current catalogue.
 
 - **Start-up** is the time from the page change to the first moving frame: the player reports `isPlaying` and `position > 0`.
 - **Ready when shown** means the player had finished `initialize()` before its page became active.
-- **Peak PSS** is the highest sample for the app plus the `media.codec` (hardware video) and `media.swcodec` (AAC audio) processes. Android decodes in those processes, not in the app.
+- **Peak PSS** is the highest sample for the app plus the `media.codec` (hardware video) and `media.swcodec` (AAC audio) processes. Android runs the decoders in those processes, so the app's own number would miss them.
 - **Received** is the bytes the app received during the 20 swipes, from Android's `TrafficStats`. It was added for the second run only, so it is a single run.
 
 | Preload radius | Players (max) | Ready when shown | Start-up p50 | p90 | Peak PSS, app + codecs | Received in 20 swipes |
@@ -110,7 +109,7 @@ Not measured, so not claimed: iOS numbers, a low-end Android phone, mobile data,
 
 **`inactive` pauses playback.** Lock screen over the app, notification shade, system dialogs and a flash SMS all pause the video. This is the conservative choice for a feed with sound. The alternative is to keep playing while a translucent system UI is up.
 
-**Bundled posters.** Using each stream's real first frame makes the handoff seamless, but a real backend has to generate that frame and serve it with the same crop. A mid-video thumbnail would flash when the first frame replaced it.
+**Bundled posters.** Using each stream's real first frame avoids a visible jump at the handoff, but a real backend has to generate that frame and serve it with the same crop. A mid-video thumbnail would flash when the first frame replaced it.
 
 ## RTL and the composer
 
