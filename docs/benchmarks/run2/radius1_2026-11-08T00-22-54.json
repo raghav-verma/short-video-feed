@@ -1,0 +1,164 @@
+{
+  "preload_radius": 1,
+  "swipes": 20,
+  "dwell_ms": 4000,
+  "platform": "android",
+  "os_version": "IN2011_13.1.0.590(EX01)",
+  "first_video_ms": 707,
+  "startup_all": {
+    "count": 20,
+    "p50_ms": 124,
+    "p90_ms": 262,
+    "max_ms": 3037
+  },
+  "startup_preloaded": {
+    "count": 18,
+    "p50_ms": 116,
+    "p90_ms": 210,
+    "max_ms": 262
+  },
+  "startup_cold": {
+    "count": 2,
+    "p50_ms": 3037,
+    "p90_ms": 3037,
+    "max_ms": 3037
+  },
+  "initialize": {
+    "count": 20,
+    "p50_ms": 1153,
+    "p90_ms": 2882,
+    "max_ms": 7349
+  },
+  "init_failures": 0,
+  "max_live_players": 3,
+  "startups": [
+    {
+      "id": "bipbop_fmp4",
+      "preloaded": true,
+      "ms": 109
+    },
+    {
+      "id": "tos_usp",
+      "preloaded": true,
+      "ms": 110
+    },
+    {
+      "id": "bipbop_ts",
+      "preloaded": true,
+      "ms": 105
+    },
+    {
+      "id": "angel_one",
+      "preloaded": true,
+      "ms": 113
+    },
+    {
+      "id": "dark_truths",
+      "preloaded": true,
+      "ms": 216
+    },
+    {
+      "id": "butterfly",
+      "preloaded": true,
+      "ms": 116
+    },
+    {
+      "id": "bee",
+      "preloaded": true,
+      "ms": 113
+    },
+    {
+      "id": "bbb_mux",
+      "preloaded": true,
+      "ms": 125
+    },
+    {
+      "id": "bipbop_fmp4",
+      "preloaded": true,
+      "ms": 111
+    },
+    {
+      "id": "tos_usp",
+      "preloaded": true,
+      "ms": 262
+    },
+    {
+      "id": "bipbop_ts",
+      "preloaded": true,
+      "ms": 126
+    },
+    {
+      "id": "angel_one",
+      "preloaded": true,
+      "ms": 127
+    },
+    {
+      "id": "dark_truths",
+      "preloaded": true,
+      "ms": 115
+    },
+    {
+      "id": "butterfly",
+      "preloaded": true,
+      "ms": 136
+    },
+    {
+      "id": "bee",
+      "preloaded": true,
+      "ms": 116
+    },
+    {
+      "id": "bbb_mux",
+      "preloaded": true,
+      "ms": 106
+    },
+    {
+      "id": "bipbop_fmp4",
+      "preloaded": false,
+      "ms": 3037
+    },
+    {
+      "id": "tos_usp",
+      "preloaded": false,
+      "ms": 1402
+    },
+    {
+      "id": "bipbop_ts",
+      "preloaded": true,
+      "ms": 210
+    },
+    {
+      "id": "angel_one",
+      "preloaded": true,
+      "ms": 124
+    }
+  ],
+  "rss_mb": {
+    "start": 240.6,
+    "max": 273.4,
+    "end": 243.8,
+    "samples": [
+      240.6,
+      236.2,
+      250.4,
+      242.6,
+      241.2,
+      248.8,
+      250.9,
+      248.9,
+      265.7,
+      269.3,
+      255.0,
+      244.4,
+      261.7,
+      273.4,
+      263.9,
+      263.8,
+      250.2,
+      247.5,
+      254.4,
+      245.7,
+      243.8
+    ]
+  }
+}

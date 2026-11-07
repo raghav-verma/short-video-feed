@@ -97,7 +97,7 @@ class _FeedPageState extends ConsumerState<FeedPage> with RouteAware {
   }
 
   /// Only `resumed` counts as visible. `inactive` covers the lock screen
-  /// over a running app (seen on a OnePlus 8 Pro: the decoder kept going
+  /// over a running app (seen on a OnePlus 8: the decoder kept going
   /// behind the keyguard), the app switcher and system sheets; a feed should
   /// not play sound behind any of them.
   static bool _isVisible(AppLifecycleState? state) =>

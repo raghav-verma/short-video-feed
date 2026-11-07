@@ -25,10 +25,31 @@ class PostOverlay extends StatelessWidget {
     final locale = Localizations.localeOf(context).toLanguageTag();
     final compact = NumberFormat.compact(locale: locale);
     final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final topInset = MediaQuery.paddingOf(context).top;
     const textStyle = TextStyle(color: Colors.white, fontSize: 15, height: 1.3);
 
     return Stack(
       children: [
+        // Keeps the status bar and the transparent app bar readable over
+        // bright video.
+        Align(
+          alignment: Alignment.topCenter,
+          child: IgnorePointer(
+            child: SizedBox(
+              height: topInset + kToolbarHeight + 48,
+              width: double.infinity,
+              child: const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0x8C000000), Colors.transparent],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         const Align(
           alignment: Alignment.bottomCenter,
           child: IgnorePointer(

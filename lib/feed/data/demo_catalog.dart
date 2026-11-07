@@ -2,7 +2,7 @@ import '../domain/video_post.dart';
 
 /// Public test streams that respond over HTTPS (checked 7 Nov 2026).
 ///
-/// Six are HLS (MPEG-TS and fMP4 segments, H.264 + AAC, several ABR ladders)
+/// Five are HLS (MPEG-TS and fMP4 segments, H.264 + AAC, several ABR ladders)
 /// and two are progressive MP4, so the pool is exercised on both kinds of
 /// source. None of them are portrait, so the feed crops them with
 /// `BoxFit.cover`, the same as a real feed does with landscape uploads.
@@ -49,16 +49,6 @@ const List<VideoPost> demoCatalog = [
     authorName: 'Test Cards',
     caption: 'The bipbop test card. The timecode makes rebuffering easy to spot. #testing',
     likeCount: 512,
-  ),
-  VideoPost(
-    id: 'angel_one',
-    videoUrl: 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/hls.m3u8',
-    format: StreamFormat.hls,
-    posterAsset: 'assets/posters/angel_one.jpg',
-    authorHandle: 'layla.h',
-    authorName: 'ليلى حسن',
-    caption: 'مثال للبث التكيفي مع عدة مسارات صوتية @omar_dev #برمجة',
-    likeCount: 45200,
   ),
   VideoPost(
     id: 'dark_truths',

@@ -3,11 +3,13 @@ import 'dart:io' show ProcessInfo;
 
 import 'package:flutter/material.dart';
 
+import '../playback/diagnostics.dart';
 import '../playback/playback_metrics.dart';
 import '../playback/video_controller_pool.dart';
 
-/// Debug overlay: live players in the pool, start-up timings and process
-/// memory. Toggled from the feed's app bar.
+/// Debug overlay: live players in the pool, start-up timings, process memory
+/// and (on Android) data received since the overlay opened. Toggled from the
+/// feed's app bar.
 class PlaybackHud extends StatefulWidget {
   const PlaybackHud({super.key, required this.pool, required this.metrics});
 
@@ -21,17 +23,24 @@ class PlaybackHud extends StatefulWidget {
 class _PlaybackHudState extends State<PlaybackHud> {
   Timer? _timer;
   int _rssBytes = 0;
+  int? _rxBaseline;
+  int? _rxBytes;
 
   @override
   void initState() {
     super.initState();
-    _sample();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _sample());
+    unawaited(_sample());
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => unawaited(_sample()));
   }
 
-  void _sample() {
+  Future<void> _sample() async {
+    final rx = await Diagnostics.uidRxBytes();
     if (!mounted) return;
-    setState(() => _rssBytes = ProcessInfo.currentRss);
+    setState(() {
+      _rssBytes = ProcessInfo.currentRss;
+      _rxBaseline ??= rx;
+      _rxBytes = rx;
+    });
   }
 
   @override
@@ -68,6 +77,9 @@ class _PlaybackHudState extends State<PlaybackHud> {
               'preloaded   ${m.preloadedStats}',
               'cold        ${m.coldStats}',
               'initialize  ${m.initStats}',
+              if (_rxBytes != null && _rxBaseline != null)
+                'received    ${((_rxBytes! - _rxBaseline!) / (1024 * 1024)).toStringAsFixed(1)} MB'
+                    ' since this overlay opened',
             ];
             return DecoratedBox(
               decoration: BoxDecoration(

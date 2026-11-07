@@ -78,3 +78,6 @@ sentry.properties
 # Profiling output (large raw traces; summaries live in docs/)
 /benchmark_output/
 *.perfetto-trace
+
+# Golden test diffs (CI uploads these as an artifact on failure)
+test/golden/failures/

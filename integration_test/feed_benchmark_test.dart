@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:short_video_feed/app/app.dart';
 import 'package:short_video_feed/app/app_config.dart';
+import 'package:short_video_feed/feed/playback/diagnostics.dart';
 import 'package:short_video_feed/feed/playback/playback_providers.dart';
 
 const int swipes = int.fromEnvironment('BENCH_SWIPES', defaultValue: 20);
@@ -35,6 +36,7 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: dwellMs));
     metrics.reset();
 
+    final rxBefore = await Diagnostics.uidRxBytes();
     final rssMb = <double>[_rssMb()];
     final pager = find.byKey(const Key('feed-pager'));
     for (var i = 0; i < swipes; i++) {
@@ -42,6 +44,7 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: dwellMs));
       rssMb.add(_rssMb());
     }
+    final rxAfter = await Diagnostics.uidRxBytes();
 
     binding.reportData = {
       'preload_radius': AppConfig.preloadRadius,
@@ -50,6 +53,8 @@ void main() {
       'platform': Platform.operatingSystem,
       'os_version': Platform.operatingSystemVersion,
       'first_video_ms': firstVideoMs,
+      // Bytes received during the swipes only (start-up excluded).
+      if (rxBefore != null && rxAfter != null) 'received_mb': (rxAfter - rxBefore) / (1024 * 1024),
       ...metrics.toJson(),
       'startups': [
         for (final s in metrics.startups)
